@@ -322,4 +322,172 @@ Import-Module AzFilesHybrid
 
 ---
 
-## Validate Azure Storage
+## Validate Azure Storage Account Configuration
+
+### Obtain Storage Account Key
+
+```powershell
+Get-AzStorageAccountKey `
+    -ResourceGroupName "Polaris_Domain_RG" `
+    -Name "phdstor"
+```
+
+### Validate AD DS Authentication
+
+```powershell
+Debug-AzStorageAccountADDSAuth
+```
+
+### Validate General Storage Authentication
+
+```powershell
+Debug-AzStorageAccountAuth
+```
+
+---
+
+## Verify SMB Access to Azure Files
+
+```powershell
+Test-NetConnection `
+    -ComputerName "cypriotstorage.file.core.windows.net" `
+    -Port 445
+```
+
+---
+
+## Environment Reference
+
+```text
+Subscription / Tenant ID
+16a7b133-0931-429f-a865-b7eaf5bec952
+
+Resource Group
+Polaris_Domain_RG
+```
+
+---
+
+## Map Azure File Share
+
+### Persistent Drive Mapping
+
+```powershell
+New-PSDrive `
+    -Name "T" `
+    -PSProvider FileSystem `
+    -Root "\\phdstor.file.core.windows.net\phdtest" `
+    -Persist
+```
+
+---
+
+## Troubleshooting
+
+### Error
+
+```text
+Import-Module : The specified module 'Az.Network' was not loaded because no valid module file was found in any module directory.
+
+At C:\Users\eiresvc\Documents\WindowsPowerShell\Modules\AzFilesHybrid\0.3.2.0\AzFilesHybrid.psm1:1104 char:5
+
+Import-Module -Name Az.Network -Global -ErrorAction Stop
+```
+
+### Cause
+
+The **Az.Network** PowerShell module is not installed on the workstation. AzFilesHybrid depends on several Az submodules and cannot load successfully unless all dependencies are present.
+
+### Resolution
+
+Install the missing module:
+
+```powershell
+Install-Module `
+    -Name Az.Network `
+    -Scope CurrentUser `
+    -AllowClobber `
+    -Force
+```
+
+Verify installation:
+
+```powershell
+Get-Module `
+    -ListAvailable `
+    -Name Az.Network
+```
+
+Import the module:
+
+```powershell
+Import-Module Az.Network
+```
+
+Then re-import AzFilesHybrid:
+
+```powershell
+Import-Module AzFilesHybrid -Force
+```
+
+If multiple AzFilesHybrid versions exist, review installed versions:
+
+```powershell
+Get-Module `
+    -ListAvailable `
+    -Name AzFilesHybrid
+```
+
+Remove older versions if necessary:
+
+```powershell
+Uninstall-Module `
+    -Name AzFilesHybrid `
+    -RequiredVersion "0.3.2.0"
+```
+
+Then import the latest version:
+
+```powershell
+Import-Module AzFilesHybrid
+```
+
+---
+
+## Recommended Validation Sequence
+
+```powershell
+Import-Module ADSync
+Import-Module ActiveDirectory
+Import-Module Az.Accounts
+Import-Module Az.Storage
+Import-Module Az.Network
+Import-Module AzFilesHybrid
+
+Debug-AzStorageAccountADDSAuth
+
+Test-NetConnection `
+    -ComputerName "phdstor.file.core.windows.net" `
+    -Port 445
+
+New-PSDrive `
+    -Name "T" `
+    -PSProvider FileSystem `
+    -Root "\\phdstor.file.core.windows.net\phdtest" `
+    -Persist
+```
+
+### Script Encoding
+
+Save all `.ps1` files as:
+
+```text
+UTF-8 with BOM
+```
+
+In VS Code:
+
+```text
+Save with Encoding
+→ UTF-8 with BOM
+```
