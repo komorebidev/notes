@@ -491,3 +491,219 @@ In VS Code:
 Save with Encoding
 → UTF-8 with BOM
 ```
+
+# One Code Block
+
+```powershell
+# =============================================================================
+# Azure Files Hybrid Authentication Validation and Drive Mapping
+# =============================================================================
+#
+# Prerequisites
+#
+# - Ensure the user has the appropriate Azure Files SMB permissions.
+# - Verify outbound access to TCP port 445.
+# - Run PowerShell as the user who will access the Azure File Share.
+# - Save any PowerShell scripts as UTF-8 with BOM.
+#
+# Subscription / Tenant ID:
+# 16a7b133-0931-429f-a865-b7eaf5bec952
+#
+# Resource Group:
+# Polaris_Domain_RG
+#
+# =============================================================================
+# Configure PowerShell Execution Policy
+# =============================================================================
+
+Set-ExecutionPolicy `
+    -ExecutionPolicy Unrestricted `
+    -Scope CurrentUser
+
+# =============================================================================
+# Verify SMB Connectivity
+# =============================================================================
+
+Test-NetConnection `
+    -ComputerName "portquiz.net" `
+    -Port 445
+
+# Successful output should include:
+#
+# TcpTestSucceeded : True
+
+# =============================================================================
+# Domain Controller Tasks
+# =============================================================================
+
+Import-Module ADSync
+
+Start-ADSyncSyncCycle `
+    -PolicyType Delta
+
+# =============================================================================
+# Domain-Joined Workstation Tasks
+# =============================================================================
+
+# Install RSAT Active Directory Tools
+
+Add-WindowsCapability `
+    -Online `
+    -Name "Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0"
+
+Get-WindowsCapability `
+    -Online `
+    -Name "Rsat.ActiveDirectory.DS-LDS.Tools*"
+
+# Import Active Directory Module
+
+Import-Module ActiveDirectory
+
+# =============================================================================
+# Install Required Azure Modules
+# =============================================================================
+
+Install-Module `
+    -Name Az `
+    -AllowClobber `
+    -Scope CurrentUser
+
+Install-Module `
+    -Name Microsoft.Graph `
+    -AllowClobber `
+    -Scope CurrentUser
+
+Install-Module `
+    -Name Az.Storage `
+    -AllowClobber `
+    -Scope CurrentUser
+
+Import-Module Az.Storage
+
+# =============================================================================
+# Install AzFilesHybrid
+# =============================================================================
+
+Unblock-File .\CopyToPSPath.ps1
+
+.\CopyToPSPath.ps1
+
+Import-Module AzFilesHybrid
+
+# =============================================================================
+# Validate Azure Storage Account Configuration
+# =============================================================================
+
+Get-AzStorageAccountKey `
+    -ResourceGroupName "Polaris_Domain_RG" `
+    -Name "phdstor"
+
+Debug-AzStorageAccountADDSAuth
+
+Debug-AzStorageAccountAuth
+
+# =============================================================================
+# Verify SMB Access to Azure Files
+# =============================================================================
+
+Test-NetConnection `
+    -ComputerName "cypriotstorage.file.core.windows.net" `
+    -Port 445
+
+# =============================================================================
+# Map Azure File Share
+# =============================================================================
+
+New-PSDrive `
+    -Name "T" `
+    -PSProvider FileSystem `
+    -Root "\\phdstor.file.core.windows.net\phdtest" `
+    -Persist
+
+# =============================================================================
+# Troubleshooting
+# =============================================================================
+#
+# Error:
+#
+# Import-Module : The specified module 'Az.Network' was not loaded because
+# no valid module file was found in any module directory.
+#
+# At C:\Users\eiresvc\Documents\WindowsPowerShell\Modules\AzFilesHybrid\
+# 0.3.2.0\AzFilesHybrid.psm1:1104 char:5
+#
+# Import-Module -Name Az.Network -Global -ErrorAction Stop
+#
+# Cause:
+#
+# The Az.Network PowerShell module is not installed.
+# AzFilesHybrid depends on Az.Network.
+#
+# Resolution:
+#
+
+Install-Module `
+    -Name Az.Network `
+    -Scope CurrentUser `
+    -AllowClobber `
+    -Force
+
+Get-Module `
+    -ListAvailable `
+    -Name Az.Network
+
+Import-Module Az.Network
+
+Import-Module AzFilesHybrid -Force
+
+# If multiple versions exist:
+
+Get-Module `
+    -ListAvailable `
+    -Name AzFilesHybrid
+
+# Remove old version if necessary
+
+Uninstall-Module `
+    -Name AzFilesHybrid `
+    -RequiredVersion "0.3.2.0"
+
+# Import latest version
+
+Import-Module AzFilesHybrid
+
+# =============================================================================
+# Recommended Validation Sequence
+# =============================================================================
+
+Import-Module ADSync
+Import-Module ActiveDirectory
+Import-Module Az.Accounts
+Import-Module Az.Storage
+Import-Module Az.Network
+Import-Module AzFilesHybrid
+
+Debug-AzStorageAccountADDSAuth
+
+Test-NetConnection `
+    -ComputerName "phdstor.file.core.windows.net" `
+    -Port 445
+
+New-PSDrive `
+    -Name "T" `
+    -PSProvider FileSystem `
+    -Root "\\phdstor.file.core.windows.net\phdtest" `
+    -Persist
+
+# =============================================================================
+# Script Encoding
+# =============================================================================
+#
+# Save all .ps1 files as:
+# UTF-8 with BOM
+#
+# VS Code:
+# Save with Encoding -> UTF-8 with BOM
+#
+# =============================================================================
+```
