@@ -15,6 +15,8 @@ Connect-MgGraph
 
 ```
 
+* Make sure to not forget https://
+
 ## Script
 
 ```powershell
