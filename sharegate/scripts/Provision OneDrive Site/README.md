@@ -5,6 +5,14 @@
 * To fix this, just pre-provision for the whole tenant
 * Any accounts with an existing site get skipped
 
+## Getting OneDrive Site URL
+
+```powershell
+Connect-MgGraph
+(Get-MgOrganization).VerifiedDomains
+
+```
+
 ## Script
 
 ```powershell
