@@ -16,12 +16,18 @@ Connect-MgGraph
 ## Script
 
 ```powershell
-# Install modules (run once)
-Install-Module -Name Microsoft.Online.SharePoint.PowerShell -Scope CurrentUser -Force
-Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
-
-# Import modules
+# Ensure SharePoint Online Management Shell module is installed
+if (-not (Get-Module -ListAvailable -Name Microsoft.Online.SharePoint.PowerShell)) {
+    Write-Host "Installing Microsoft.Online.SharePoint.PowerShell..."
+    Install-Module -Name Microsoft.Online.SharePoint.PowerShell -Scope CurrentUser -Force
+}
 Import-Module Microsoft.Online.SharePoint.PowerShell
+
+# Ensure Microsoft Graph module is installed
+if (-not (Get-Module -ListAvailable -Name Microsoft.Graph.Users)) {
+    Write-Host "Installing Microsoft.Graph..."
+    Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
+}
 Import-Module Microsoft.Graph.Users
 
 # Prompt for the SharePoint Online Admin Center URL
