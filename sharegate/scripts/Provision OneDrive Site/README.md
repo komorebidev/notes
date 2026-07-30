@@ -8,16 +8,43 @@
 ## Script
 
 ```powershell
-# Install the SharePoint Online Management Shell module
-Install-Module `
-    -Name Microsoft.Online.SharePoint.PowerShell `
-    -Scope CurrentUser `
-    -Force
+# Install modules (run once)
+Install-Module -Name Microsoft.Online.SharePoint.PowerShell -Scope CurrentUser -Force
+Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
 
-# Connect to the SharePoint Online Admin Center
-Connect-SPOService
+# Import modules
+Import-Module Microsoft.Online.SharePoint.PowerShell
+Import-Module Microsoft.Graph.Users
 
-# Request creation of a OneDrive personal site
-Request-SPOPersonalSite `
-    -UserEmails "xxx@email.com"
+# Prompt for the SharePoint Online Admin Center URL
+$SPOAdminUrl = Read-Host "Enter your SharePoint Online Admin URL (e.g. https://contoso-admin.sharepoint.com)"
+
+# Connect to SharePoint Online
+Connect-SPOService -Url $SPOAdminUrl
+
+# Connect to Microsoft Graph
+Connect-MgGraph -Scopes "User.Read.All","Directory.Read.All"
+
+# Get all licensed member users
+$users = Get-MgUser -All -Property UserPrincipalName,AssignedLicenses,UserType |
+    Where-Object {
+        $_.UserType -eq "Member" -and
+        $_.AssignedLicenses.Count -gt 0
+    } |
+    Select-Object -ExpandProperty UserPrincipalName
+
+Write-Host "Found $($users.Count) licensed users."
+
+# Submit OneDrive provisioning requests in batches
+$batchSize = 200
+
+for ($i = 0; $i -lt $users.Count; $i += $batchSize) {
+    $batch = $users[$i..([Math]::Min($i + $batchSize - 1, $users.Count - 1))]
+    Request-SPOPersonalSite -UserEmails $batch
+    Write-Host "Submitted batch $([Math]::Floor($i / $batchSize) + 1)"
+}
+
+Write-Host "OneDrive provisioning requests have been submitted."
 ```
+
+* Check in the admin portal for the provisioned OneDrive sites
