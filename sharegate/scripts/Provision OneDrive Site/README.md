@@ -11,6 +11,8 @@
 Connect-MgGraph
 (Get-MgOrganization).VerifiedDomains
 
+# Copy the value for the .onmicrosoft as the URL for the next script
+
 ```
 
 ## Script
