@@ -195,3 +195,16 @@ foreach ($Row in $Table) {
 # Remove-SiteCollectionAdministrator -Site $srcSite
 # Remove-SiteCollectionAdministrator -Site $dstSite
 ```
+
+## Run commands
+
+
+### What-If
+```powershell
+.\CopyContent.ps1 -WhatIf 2>&1 | Tee-Object -Filepath "C:\CSV\whatif-$(Get-Date -Format 'yyyyMMdd').txt"
+```
+
+### Production
+```powershell
+.\CopyContent.ps1 2>&1 | Tee-Object -Filepath "C:\CSV\$(Get-Date -Format 'yyyyMMdd').txt"
+```
