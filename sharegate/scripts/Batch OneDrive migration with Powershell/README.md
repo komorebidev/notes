@@ -9,7 +9,7 @@
 
 * https://help.sharegate.com/en/articles/10236381-migrate-onedrive-for-business-to-onedrive-for-business-with-powershell
 
-## Sample
+## Original Sample
 
 ```powershell
 Import-Module Sharegate
