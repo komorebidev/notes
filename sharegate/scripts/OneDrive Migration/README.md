@@ -150,15 +150,15 @@ Import-Module ShareGate
 
 $CopySettings = New-CopySettings -OnContentItemExists IncrementalUpdate
 
-$CsvFile = "C:\tmp\migration.csv"
+$csvFile = "C:\CSV\CopyContent.csv"
 $Table = Import-Csv $CsvFile -Delimiter ","
 
 $SrcSiteConnection = Connect-Site `
-    -Url "https://starasiaenterprises-my.sharepoint.com/" `
+    -Url "https://sagl365-my.sharepoint.com/" `
     -ModernAuth
 
 $DstSiteConnection = Connect-Site `
-    -Url "https://polarishd-my.sharepoint.com/" `
+    -Url "https://glcm001-my.sharepoint.com/" `
     -ModernAuth
 
 Set-Variable srcSite, dstSite, srcList, dstList
