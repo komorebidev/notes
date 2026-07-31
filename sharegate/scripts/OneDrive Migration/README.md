@@ -41,7 +41,7 @@ Disconnect-MgGraph
 ## Setup connections in Sharegate UI
 
 * Use global admin accounts as connections using modern auth
-* Then, go to security tab and authorize + consent to everything
+* Then, go to security tab and authorize + consent to everything including site collection permissions
 * Add the same connections in the explorer tab
 * Once added, will be ready to move on to the next section
 
