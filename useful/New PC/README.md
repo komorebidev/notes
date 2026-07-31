@@ -11,27 +11,28 @@ winget install --id GnuWin32.CoreUtils -e --silent
 winget install --id Microsoft.VisualStudio.2022.Community -e --silent
 
 # ==========================================================
-# PowerToys Clean Redeploy + Awake Configuration
+# PowerToys Silent Redeploy
+# No Awake configuration changes
 # ==========================================================
 
-Write-Output "=== PowerToys Deployment Script Starting ==="
+Write-Output "=== PowerToys Deployment Starting ==="
 
 
 # ==========================================================
-# Check existing PowerToys installation
+# Check existing installation
 # ==========================================================
 
 Write-Output ""
 Write-Output "Checking for existing PowerToys installation..."
 
-$installedPowerToys = winget list --id Microsoft.PowerToys --source winget 2>$null
+$installed = winget list --id Microsoft.PowerToys --source winget 2>$null
 
 
-if ($installedPowerToys -match "PowerToys") {
+if ($installed -match "PowerToys") {
 
-    Write-Output "Existing PowerToys installation detected."
+    Write-Output "Existing PowerToys installation found."
 
-    Write-Output "Stopping PowerToys processes..."
+    Write-Output "Stopping PowerToys..."
 
     Get-Process -Name "PowerToys" -ErrorAction SilentlyContinue |
         Stop-Process -Force -ErrorAction SilentlyContinue
@@ -64,9 +65,6 @@ if ($installedPowerToys -match "PowerToys") {
         -Force `
         -ErrorAction SilentlyContinue
 
-
-    Write-Output "Previous PowerToys removed."
-
 }
 else {
 
@@ -77,11 +75,12 @@ else {
 
 
 # ==========================================================
-# Install PowerToys
+# Install PowerToys silently
 # ==========================================================
 
 Write-Output ""
-Write-Output "Installing Microsoft PowerToys..."
+Write-Output "Installing PowerToys silently..."
+
 
 winget install `
     --id Microsoft.PowerToys `
@@ -92,186 +91,28 @@ winget install `
     --accept-source-agreements
 
 
+
 Start-Sleep -Seconds 10
 
 
 
 # ==========================================================
-# Find PowerToys settings JSON
+# Find PowerToys executable
 # ==========================================================
 
 Write-Output ""
-Write-Output "Searching for PowerToys configuration files..."
+Write-Output "Finding PowerToys executable..."
 
-
-$searchPaths = @(
-    "$env:LOCALAPPDATA\Microsoft\PowerToys",
-    "$env:APPDATA\Microsoft\PowerToys"
-)
-
-
-$jsonFiles = foreach ($path in $searchPaths) {
-
-    if (Test-Path $path) {
-
-        Get-ChildItem `
-            -Path $path `
-            -Recurse `
-            -Filter "*.json" `
-            -File `
-            -ErrorAction SilentlyContinue
-    }
-}
-
-
-
-if (-not $jsonFiles) {
-
-    Write-Output "No JSON settings found."
-    Write-Output "Starting PowerToys once to generate configuration..."
-
-    throw "Run PowerToys once before applying configuration."
-}
-
-
-
-# ==========================================================
-# Find Awake module
-# ==========================================================
-
-Write-Output "Searching for Awake module..."
-
-
-$awakeFile = $null
-$jsonRoot = $null
-$awakeModule = $null
-
-
-
-foreach ($file in $jsonFiles) {
-
-    try {
-
-        $json = Get-Content $file.FullName -Raw |
-            ConvertFrom-Json
-
-
-        foreach ($property in $json.PSObject.Properties) {
-
-
-            if ($property.Value.name -eq "Awake") {
-
-                $awakeFile = $file.FullName
-                $jsonRoot = $json
-                $awakeModule = $property.Value
-
-                break
-            }
-        }
-
-
-        if ($awakeModule) {
-            break
-        }
-
-    }
-    catch {
-
-        continue
-    }
-}
-
-
-
-if (-not $awakeModule) {
-
-    Write-Output "Awake module was not found."
-    Write-Output "Files scanned:"
-    $jsonFiles.FullName
-
-    throw "Unable to locate Awake configuration."
-}
-
-
-
-Write-Output "Awake configuration found:"
-Write-Output $awakeFile
-
-
-
-# ==========================================================
-# Backup configuration
-# ==========================================================
-
-Copy-Item `
-    $awakeFile `
-    "$awakeFile.backup" `
-    -Force
-
-
-
-# ==========================================================
-# Configure Awake
-# ==========================================================
-
-Write-Output ""
-Write-Output "Applying Awake configuration..."
-
-
-$awakeModule.properties.keepDisplayOn = $true
-$awakeModule.properties.mode = 1
-
-$awakeModule.properties.intervalHours = 0
-$awakeModule.properties.intervalMinutes = 0
-$awakeModule.properties.expirationDateTime = $null
-
-
-
-Write-Output "Awake settings:"
-Write-Output "- Keep display on: Enabled"
-Write-Output "- Mode: Indefinite"
-
-
-
-# Save configuration
-
-$jsonRoot |
-    ConvertTo-Json -Depth 100 |
-    Set-Content `
-        -Path $awakeFile `
-        -Encoding UTF8
-
-
-
-Write-Output "Settings saved."
-
-
-
-# ==========================================================
-# Enable PowerToys startup
-# ==========================================================
-
-Write-Output ""
-Write-Output "Enabling PowerToys startup..."
-
-
-$startupKey = `
-"HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-
-
-# Find executable
 
 $powerToysExe = $null
 
 
-$pathLookup = Get-Command `
-    "PowerToys.exe" `
-    -ErrorAction SilentlyContinue
+$cmd = Get-Command PowerToys.exe -ErrorAction SilentlyContinue
 
 
-if ($pathLookup) {
+if ($cmd) {
 
-    $powerToysExe = $pathLookup.Source
+    $powerToysExe = $cmd.Source
 }
 
 
@@ -295,8 +136,8 @@ if (-not $powerToysExe) {
             $found = Get-ChildItem `
                 -Path $location `
                 -Filter "PowerToys.exe" `
-                -Recurse `
                 -File `
+                -Recurse `
                 -ErrorAction SilentlyContinue |
                 Select-Object -First 1
 
@@ -312,81 +153,58 @@ if (-not $powerToysExe) {
 
 
 
-if ($powerToysExe) {
+if (-not $powerToysExe) {
 
-
-    New-ItemProperty `
-        -Path $startupKey `
-        -Name "PowerToys" `
-        -Value "`"$powerToysExe`" --startup" `
-        -PropertyType String `
-        -Force |
-        Out-Null
-
-
-    Write-Output "Startup enabled."
-
+    Write-Output "ERROR: PowerToys executable not found."
+    Read-Host "Press ENTER to close"
+    exit 1
 }
-else {
 
-    Write-Output "PowerToys executable not found for startup registration."
 
-}
+Write-Output "Found:"
+Write-Output $powerToysExe
 
 
 
 # ==========================================================
-# Restart PowerToys
+# Enable startup
 # ==========================================================
 
 Write-Output ""
-Write-Output "Restarting PowerToys..."
+Write-Output "Enabling PowerToys startup..."
 
 
-try {
+$startupPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 
 
-    Get-Process `
-        -Name "PowerToys" `
-        -ErrorAction SilentlyContinue |
-        Stop-Process `
-        -Force `
-        -ErrorAction SilentlyContinue
-
-
-    Start-Sleep -Seconds 3
-
-
-
-    if (-not $powerToysExe) {
-
-        throw "PowerToys executable not found."
-    }
+New-ItemProperty `
+    -Path $startupPath `
+    -Name "PowerToys" `
+    -Value "`"$powerToysExe`" --startup" `
+    -PropertyType String `
+    -Force |
+    Out-Null
 
 
 
-    Start-Process `
-        -FilePath $powerToysExe `
-        -ArgumentList "--startup" `
-        -WorkingDirectory (Split-Path $powerToysExe) `
-        -WindowStyle Hidden
+# ==========================================================
+# Start PowerToys silently
+# ==========================================================
+
+Write-Output ""
+Write-Output "Starting PowerToys..."
 
 
-
-    Write-Output "PowerToys restarted successfully."
-
-}
-catch {
-
-    Write-Output "Restart failed:"
-    Write-Output $_.Exception.Message
-
-}
+Start-Process `
+    -FilePath $powerToysExe `
+    -ArgumentList "--startup" `
+    -WorkingDirectory (Split-Path $powerToysExe) `
+    -WindowStyle Hidden
 
 
 
 Write-Output ""
-Write-Output "=== Deployment Complete ==="
+Write-Output "=== PowerToys Deployment Complete ==="
 
 
 Read-Host "Press ENTER to close"
