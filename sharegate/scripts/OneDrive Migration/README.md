@@ -198,6 +198,10 @@ foreach ($Row in $Table) {
 
 ## Run commands
 
+## Note
+
+* Do not run with Powershell 7
+* It will fail
 
 ### What-If
 ```powershell
