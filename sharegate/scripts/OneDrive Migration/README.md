@@ -3,7 +3,82 @@
 * For automated migration, scripts are needed
 * The Sharegate GUI supports one by one only
 
-## Script sample
+## Sharegate UI
+
+* First, need to set up tenant connections under modern auth
+* The site format is https://tenantname-admin.sharepoint.com
+* Can get the tenant name with below script (will output domains, use the .onmicrosoft alias)
+
+### MS Graph Connection
+
+```powershell
+# Ensure SharePoint Online Management Shell module is installed
+if (-not (Get-Module -ListAvailable -Name Microsoft.Online.SharePoint.PowerShell)) {
+    Write-Host "Installing Microsoft.Online.SharePoint.PowerShell..."
+    Install-Module -Name Microsoft.Online.SharePoint.PowerShell -Scope CurrentUser -Force
+}
+Import-Module Microsoft.Online.SharePoint.PowerShell
+
+# Ensure Microsoft Graph module is installed
+if (-not (Get-Module -ListAvailable -Name Microsoft.Graph.Users)) {
+    Write-Host "Installing Microsoft.Graph..."
+    Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
+}
+Import-Module Microsoft.Graph.Users
+
+Connect-MgGraph
+(Get-MgOrganization).VerifiedDomains
+
+
+```
+
+### Disconnect from MS Graph if needed to get other tenant name
+
+```powershell
+Disconnect-MgGraph
+```
+
+## Adding migration permissions to the OneDrive accounts
+
+* From the GUI, will need to add extra permissions onto the user OneDrive accounts
+* Needed before running the batch script
+* Otherwise it will fail
+
+### Reference article
+
+* https://help.sharegate.com/en/articles/10236381-migrate-onedrive-for-business-to-onedrive-for-business-with-powershell#01GWPSQXHCCXXZT7D9RGB5PMTQ
+
+1. Go to All reports.
+
+1. Click Create custom report in the top right corner.
+
+1. Select OneDrive for Business as your object type.
+
+1. Click Continue without saving.
+
+1. Select your source Tenant.
+
+1. Click Run.
+
+1. Select all your OneDrives with the checkmark box at the top of the list.
+
+1. Click Edit in the Quick actions menu
+
+1. Select Add administrators in the Transformations dropdown.
+
+1. Search and add your account in the Select user or group field that appears.
+
+1. Click Apply.
+
+1. Click Back two times to go back to your report results.
+
+1. Click Export in the top right corner.
+
+1. Save the file on your drive.
+
+1. Repeat steps (1) to (14), selecting your destination tenant at step (5).
+
+## OneDrive migration script sample
 
 ```powershell
 # NOTE:
@@ -54,7 +129,7 @@ foreach ($Row in $Table) {
         -CopySettings $CopySettings
 }
 
-# Remove site collection administrator permissions
+# Remove site collection administrator permissions (uncomment this on the final run so that permissions can be removed from user OneDrive sites)
 # Remove-SiteCollectionAdministrator -Site $srcSite
 # Remove-SiteCollectionAdministrator -Site $dstSite
 ```

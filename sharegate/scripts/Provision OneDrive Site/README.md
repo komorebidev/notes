@@ -31,6 +31,13 @@ Connect-MgGraph
 
 * Make sure to not forget https://
 
+### Disconnect from MS Graph if needed
+
+```powershell
+Disconnect-MgGraph
+```
+
+
 ## Script
 
 ```powershell
