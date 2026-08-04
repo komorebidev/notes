@@ -32,6 +32,7 @@
 * After enrollment, Ninja RMM tool will install (check and wait for install if it takes long)
 * Change PC name to tr008tempxx (there is a tracker file somewhere)
 * Uninstall Teamviewer after confirming Ninja tool function
+* Change ownership to corporate in Intune
 
 ### The Row
 
