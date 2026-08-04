@@ -5,7 +5,22 @@
 * Will need to create local admin before Intune enrollment
 * Get from 1Pass and refer to new PC guide
 
-## For existing PC
+## Before enrolling
+
+### Microsoft 365 Admin Portal
+* Add licenses to user
+1. Enterprise Mobility and Security E3
+1. Microsoft Defender for Endpoint P2
+1. Office 365 E3
+
+### Intune
+
+* Add to groups
+1. Windows_Intune_SG
+1. Windows_Updates_SG
+1. Defender_Deployment_SG 
+
+### For existing PC
 
 * Download company portal
 * Enroll with tenant account
