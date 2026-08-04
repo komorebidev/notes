@@ -20,6 +20,11 @@
 1. Windows_Updates_SG
 1. Defender_Deployment_SG 
 
+### When enrolling
+
+* Sometimes, URL is needed
+* https://enrollment.manage.microsoft.com/enrollmentserver/discovery.svc
+
 ### For existing PC
 
 * Download company portal
