@@ -22,3 +22,7 @@
 * Need to make appointment with the stores
 * By Teams chat
 * Retail locations so replies won't be fast
+* POS system is on iPad (already enrolled Intune)
+* Each store has one PC or so
+* Each staff has a phone (with Teams and Outlook)
+* Printers
