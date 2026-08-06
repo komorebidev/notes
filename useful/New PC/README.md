@@ -35,12 +35,31 @@ foreach ($app in $AppsToRemove) {
 
 Write-Host "Cloud PC app cleanup finished successfully! Microsoft Store was preserved." -ForegroundColor Green
 
-winget install --id AgileBits.1Password -e --silent
-winget install --id Microsoft.PowerShell -e --silent
-winget install --id GitHub.cli -e --silent
-winget install --id Git.Git -e --silent
-winget install --id=Mozilla.Firefox -e --silent --accept-source-agreements --accept-package-agreements
-#winget install --id Microsoft.VisualStudio.2022.Community -e --silent
+$apps = @(
+    @{ Id = "AgileBits.1Password"; Name = "1Password" },
+    @{ Id = "Microsoft.PowerShell"; Name = "PowerShell" },
+    @{ Id = "GitHub.cli"; Name = "GitHub CLI" },
+    @{ Id = "Git.Git"; Name = "Git" },
+    @{ Id = "Mozilla.Firefox"; Name = "Firefox" }
+)
+
+foreach ($app in $apps) {
+    Write-Host "Checking for $($app.Name)..." -ForegroundColor Cyan
+    
+    # Check if the app is already installed via winget
+    $installed = winget list --id $app.Id --exact --accept-source-agreements 2>&1
+    
+    if ($installed -match $app.Id) {
+        Write-Host "$($app.Name) is already installed. Skipping." -ForegroundColor Yellow
+    } else {
+        Write-Host "Installing $($app.Name)..." -ForegroundColor Green
+        winget install --id $app.Id -e --silent --accept-source-agreements --accept-package-agreements
+    }
+    
+    Write-Host "----------------------------------------"
+}
+
+Write-Host "All installations complete!" -ForegroundColor Green
 
 # ==========================================================
 # PowerToys Silent Redeploy
