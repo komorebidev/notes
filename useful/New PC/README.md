@@ -1,6 +1,6 @@
 # New PC
 
-* Debloar and add packages through winget to make things easier
+* Debloat and add packages through winget to make things easier
 
 ```
 Write-Host "Starting Cloud PC bloatware removal..." -ForegroundColor Cyan
