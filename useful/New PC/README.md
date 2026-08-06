@@ -1,14 +1,46 @@
 # New PC
 
-* Add below packages through winget to make things easier
+* Debloar and add packages through winget to make things easier
 
 ```
+Write-Host "Starting Cloud PC bloatware removal..." -ForegroundColor Cyan
+
+# List of consumer and non-essential apps common in cloud environments to remove
+$AppsToRemove = @(
+    "*Microsoft.XboxApp*",
+    "*Microsoft.XboxGamingOverlay*",
+    "*Microsoft.XboxGameOverlay*",
+    "*Microsoft.XboxIdentityProvider*",
+    "*Microsoft.XboxSpeechToTextOverlay*",
+    "*Microsoft.ZuneMusic*",
+    "*Microsoft.ZuneVideo*",
+    "*Microsoft.MicrosoftSolitaireCollection*",
+    "*Microsoft.BingNews*",
+    "*Microsoft.BingWeather*",
+    "*Microsoft.GetHelp*",
+    "*Microsoft.Getstarted*",
+    "*Microsoft.People*",
+    "*Microsoft.Todos*",
+    "*Microsoft.PowerAutomateDesktop*",
+    "*Clipchamp.Clipchamp*"
+)
+
+foreach ($app in $AppsToRemove) {
+    # Remove for the current user
+    Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -ErrorAction SilentlyContinue
+    
+    # Remove provisioned package so it doesn't reinstall for new users (crucial for Cloud PCs)
+    Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $app | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+}
+
+Write-Host "Cloud PC app cleanup finished successfully! Microsoft Store was preserved." -ForegroundColor Green
+
 winget install --id AgileBits.1Password -e --silent
 winget install --id Microsoft.PowerShell -e --silent
 winget install --id GitHub.cli -e --silent
 winget install --id Git.Git -e --silent
-winget install --id GnuWin32.CoreUtils -e --silent
-winget install --id Microsoft.VisualStudio.2022.Community -e --silent
+winget install --id=Mozilla.Firefox -e --silent --accept-source-agreements --accept-package-agreements
+#winget install --id Microsoft.VisualStudio.2022.Community -e --silent
 
 # ==========================================================
 # PowerToys Silent Redeploy
