@@ -39,6 +39,7 @@ if ($sandboxFeature.State -eq "Enabled") {
 * Tries to get DNS dynamically but can fail
 * Set them manually if needed
 
+```powershell
 netsh interface ipv4 add dnsservers "イーサネット" 8.8.4.4 index=2
-
 netsh interface ipv4 set dnsservers "イーサネット" static 8.8.8.8 primary
+```
