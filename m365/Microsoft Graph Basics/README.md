@@ -20,9 +20,6 @@ if (-not (Get-Module -ListAvailable -Name Microsoft.Graph)) {
     Write-Host "Microsoft.Graph module is already installed." -ForegroundColor Cyan
 }
 
-# Import the module into the current session
-Import-Module Microsoft.Graph
-Write-Host "Microsoft.Graph module imported and ready to use!" -ForegroundColor Green
 ```
 
 ## Connecting to a M365 Tenant
