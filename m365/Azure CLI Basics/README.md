@@ -1,6 +1,39 @@
 # Azure CLI Basics
 
+## Installing Azure CLI
+
+* For basic connection to Azure tenant
+
+```powershell
+$azInstalled = $null -ne (Get-Command az -ErrorAction SilentlyContinue)
+
+if (-not $azInstalled) {
+    Write-Host "Azure CLI not found. Installing via winget..." -ForegroundColor Yellow
+    
+    # Install Azure CLI using winget
+    winget install --exact --id Microsoft.AzureCLI -e --accept-source-agreements --accept-package-agreements
+    
+    # Detect current PowerShell version to reopen the correct shell
+    $psMajorVersion = $PSVersionTable.PSVersion.Major
+    if ($psMajorVersion -ge 7) {
+        $psExe = "pwsh.exe"
+    } else {
+        $psExe = "powershell.exe"
+    }
+
+    Write-Host "Restarting PowerShell session ($psExe) to pick up the new PATH variables..." -ForegroundColor Cyan
+    
+    # Launch a new window of the corresponding PowerShell version and exit this one
+    Start-Process $psExe
+    exit
+} else {
+    Write-Host "Azure CLI is already installed and ready to use." -ForegroundColor Green
+}
+```
+
 ## Installing Az module
+
+* For read and write of Azure resources
 
 ```powershell
 if (-not (Get-Module -ListAvailable -Name Az)) {
