@@ -51,9 +51,6 @@ if (-not (Get-Module -ListAvailable -Name Az)) {
     Write-Host "Az module is already installed." -ForegroundColor Cyan
 }
 
-# Import the module into the session
-Import-Module Az
-Write-Host "Az module imported and ready to use!" -ForegroundColor Green
 ```
 
 ## Login and Account Management Commands
