@@ -1,5 +1,10 @@
 # Azure CLI Basics
 
+* If using cloud shell, less need to install modules
+* No need to authenticate repeatedly either
+* Git is supported (gh command works)
+* https://shell.azure.com
+
 ## Installing Azure CLI
 
 * For basic connection to Azure tenant
