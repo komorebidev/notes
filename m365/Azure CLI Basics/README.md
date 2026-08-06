@@ -106,3 +106,15 @@ az account show
 ```powershell
 az logout
 ```
+
+## Listing resource groups
+
+```powershell
+az group list --output table
+```
+
+## Listing contained resources
+
+```powershell
+az resource list -g <resource-group-name> --output table
+```
