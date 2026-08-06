@@ -8,6 +8,20 @@
 ## Getting OneDrive Site URL
 
 ```powershell
+# Ensure SharePoint Online Management Shell module is installed
+if (-not (Get-Module -ListAvailable -Name Microsoft.Online.SharePoint.PowerShell)) {
+    Write-Host "Installing Microsoft.Online.SharePoint.PowerShell..."
+    Install-Module -Name Microsoft.Online.SharePoint.PowerShell -Scope CurrentUser -Force
+}
+Import-Module Microsoft.Online.SharePoint.PowerShell
+
+# Ensure Microsoft Graph module is installed
+if (-not (Get-Module -ListAvailable -Name Microsoft.Graph.Users)) {
+    Write-Host "Installing Microsoft.Graph..."
+    Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
+}
+Import-Module Microsoft.Graph.Users
+
 Connect-MgGraph
 (Get-MgOrganization).VerifiedDomains
 
@@ -16,6 +30,13 @@ Connect-MgGraph
 ```
 
 * Make sure to not forget https://
+
+### Disconnect from MS Graph if needed
+
+```powershell
+Disconnect-MgGraph
+```
+
 
 ## Script
 
