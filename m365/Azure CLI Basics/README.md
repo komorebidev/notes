@@ -1,5 +1,28 @@
 # Azure CLI Basics
 
+## Installing Az module
+
+```powershell
+if (-not (Get-Module -ListAvailable -Name Az)) {
+    Write-Host "Az module not found. Installing now..." -ForegroundColor Yellow
+    
+    # Ensure NuGet package provider is available
+    if (-not (Get-PackageProvider -ListAvailable -Name NuGet -ErrorAction SilentlyContinue)) {
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
+    }
+    
+    # Install the Az module for the current user
+    Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+    Write-Host "Az module installed successfully." -ForegroundColor Green
+} else {
+    Write-Host "Az module is already installed." -ForegroundColor Cyan
+}
+
+# Import the module into the session
+Import-Module Az
+Write-Host "Az module imported and ready to use!" -ForegroundColor Green
+```
+
 ## Login and Account Management Commands
 * Basic Interactive Login
 * Opens your default browser to sign in interactively:
