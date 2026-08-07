@@ -1,0 +1,11 @@
+<Configuration>
+   <vGPU>Enable</vGPU>
+   <Networking>Enable</Networking>
+   <AudioInput>Disable</AudioInput>
+   <VideoInput>Disable</VideoInput>
+   <ProtectedClient>Disable</ProtectedClient>
+   
+   <LogonCommand>
+      <Command>powershell.exe -WindowStyle Hidden -Command "Set-DnsClientServerAddress -InterfaceAlias 'イーサネット' -ServerAddresses ('8.8.8.8','8.8.4.4')"</Command>
+   </LogonCommand>
+</Configuration>
