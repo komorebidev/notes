@@ -140,6 +140,63 @@ foreach ($row in $table) {
 }
 ```
 
+## OneDrive migration script, WhatIf sample
+
+```powershell
+# NOTE:
+# Save this script as UTF-8 with BOM (.ps1)
+
+Import-Module ShareGate
+
+$CopySettings = New-CopySettings -OnContentItemExists IncrementalUpdate
+
+$csvFile = "C:\CSV\CopyContent.csv"
+$Table = Import-Csv $CsvFile -Delimiter ","
+
+$SrcSiteConnection = Connect-Site `
+    -Url "https://sagl365-my.sharepoint.com/" `
+    -ModernAuth
+
+$DstSiteConnection = Connect-Site `
+    -Url "https://glcm001-my.sharepoint.com/" `
+    -ModernAuth
+
+Set-Variable srcSite, dstSite, srcList, dstList
+
+foreach ($Row in $Table) {
+    Clear-Variable srcSite -ErrorAction SilentlyContinue
+    Clear-Variable dstSite -ErrorAction SilentlyContinue
+    Clear-Variable srcList -ErrorAction SilentlyContinue
+    Clear-Variable dstList -ErrorAction SilentlyContinue
+
+    $srcSite = Connect-Site `
+        -Url $Row.SourceSite `
+        -UseCredentialsFrom $SrcSiteConnection
+
+    $dstSite = Connect-Site `
+        -Url $Row.DestinationSite `
+        -UseCredentialsFrom $DstSiteConnection
+
+    $srcList = Get-List `
+        -Site $srcSite `
+        -Name "ドキュメント"
+
+    $dstList = Get-List `
+        -Site $dstSite `
+        -Name "ドキュメント"
+
+    Copy-Content `
+        -WhatIf `
+        -SourceList $srcList `
+        -DestinationList $dstList `
+        -CopySettings $CopySettings
+}
+
+# Remove site collection administrator permissions (uncomment this on the final run so that permissions can be removed from user OneDrive sites)
+# Remove-SiteCollectionAdministrator -Site $srcSite
+# Remove-SiteCollectionAdministrator -Site $dstSite
+```
+
 ## OneDrive migration script production sample
 
 ```powershell
@@ -198,17 +255,13 @@ foreach ($Row in $Table) {
 
 ## Run commands
 
-## Note
+### Note
 
-* Do not run with Powershell 7
-* It will fail
+* Do not run with Powershell 7, it will fail
+* **For WhatIf, make sure to use the WhatIf script**
+* WhatIf is not passed as argument but **needs to be specified in the script**
+* Both versions are at the top of the document
 
-### What-If
-```powershell
-.\CopyContent.ps1 -WhatIf 2>&1 | Tee-Object -Filepath "C:\CSV\whatif-$(Get-Date -Format 'yyyyMMdd').txt"
-```
-
-### Production
 ```powershell
 .\CopyContent.ps1 2>&1 | Tee-Object -Filepath "C:\CSV\$(Get-Date -Format 'yyyyMMdd').txt"
 ```
