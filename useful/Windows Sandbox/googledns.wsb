@@ -1,8 +1,9 @@
 <Configuration>
-   <vGPU>Disable</vGPU>
+   <vGPU>Enable</vGPU>
    <Networking>Enable</Networking>
    <AudioInput>Disable</AudioInput>
    <VideoInput>Disable</VideoInput>
+   <MemoryInMB>8192</MemoryInMB>
    <ProtectedClient>Disable</ProtectedClient>
    
    <LogonCommand>
