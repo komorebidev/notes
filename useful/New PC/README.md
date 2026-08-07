@@ -266,48 +266,50 @@ Read-Host "Press ENTER to close"
 ## Adding git pull to explorer (run in admin Powershell)
 
 ```powershell
-$jpcommand = Get-Command git.exe | Select-Object -ExpandProperty Definition
-
-if($jpcommand -eq $null){
-    Write-Output "Could not find git.exe in environment path"
-    Break
+# Ensure the script is running with Administrator privileges
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Error "Please run this script as an Administrator!"
+    Exit
 }
 
-Write-Output $jpcommand
+# Ensure the HKCR drive exists
+if (!(Test-Path HKCR:)) {
+    New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
+}
 
-New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+$menuName = "Git Pull Here"
 
-function createRegedit([string]$registryPath, [string]$value)
-{
-    $name = "(Default)"
+# Commands that change location, run git pull, and pause so you can see the output
+$bgCommand  = 'powershell.exe -NoProfile -Command "Set-Location -LiteralPath ''%V''; git pull; Read-Host ''Press Enter to close''"'
+$dirCommand = 'powershell.exe -NoProfile -Command "Set-Location -LiteralPath ''%1''; git pull; Read-Host ''Press Enter to close''"'
 
-    If(!(Test-Path $registryPath)){
-        New-Item -Path $registryPath -Force | Out-Null    
+# Helper function to create registry paths and properties safely
+function Set-RegistryKey {
+    param([string]$Path, [string]$Name, [string]$Value, [string]$PropertyType = "String")
+    if (!(Test-Path $Path)) {
+        New-Item -Path $Path -Force | Out-Null
     }
     
-    New-ItemProperty -Path $registryPath -Name $name -Value $value `
-        -PropertyType String -Force | Out-Null    
+    if ([string]::IsNullOrEmpty($Name)) {
+        # Set the default (unnamed) value of the key
+        Set-Item -Path $Path -Value $Value
+    } else {
+        # Set named properties (like Icon)
+        New-ItemProperty -Path $Path -Name $Name -Value $Value -PropertyType $PropertyType -Force | Out-Null
+    }
 }
 
-$openText = "Git Pull here"
+# 1. Setup for Directory Background (Right-clicking empty space inside a folder)
+$bgPath = "HKCR:\Directory\Background\shell\GitPullHere"
+Set-RegistryKey $bgPath "" $menuName
+Set-RegistryKey $bgPath "Icon" "git.exe"
+Set-RegistryKey "$bgPath\command" "" $bgCommand
 
-createRegedit "HKCR:\Directory\Background\shell\git" $openText
-createRegedit "HKCR:\Directory\shell\git" $openText
-#git.exe pull -v --progress "origin"
-$commandText = "`"" + $jpcommand + "`"--work-tree=`"%V`" --git-dir=`"%V/.git`" pull -v --progress"
+# 2. Setup for Directory (Right-clicking a folder itself)
+$dirPath = "HKCR:\Directory\shell\GitPullHere"
+Set-RegistryKey $dirPath "" $menuName
+Set-RegistryKey $dirPath "Icon" "git.exe"
+Set-RegistryKey "$dirPath\command" "" $dirCommand
 
-createRegedit "HKCR:\Directory\Background\shell\git\command" $commandText
-createRegedit "HKCR:\Directory\shell\git\command" $commandText
-
-$currentPath = (Get-Item -Path ".\" -Verbose).FullName
-
-#change to favicon-notebook.ico for alternative icon
-$jpicon = "$($currentPath)\gitfavicon.ico"
-
-#set icons
-New-ItemProperty -Path "HKCR:\Directory\Background\shell\git" -Name "Icon" -Value $jpicon `
-        -PropertyType String -Force | Out-Null    
-
-New-ItemProperty -Path "HKCR:\Directory\shell\git" -Name "Icon" -Value $jpicon `
-        -PropertyType String -Force | Out-Null  
+Write-Output "Successfully added 'Git Pull Here' to the Windows Explorer context menu!"
 ```
