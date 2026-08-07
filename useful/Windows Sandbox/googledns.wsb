@@ -1,5 +1,5 @@
 <Configuration>
-   <vGPU>Enable</vGPU>
+   <vGPU>Disable</vGPU>
    <Networking>Enable</Networking>
    <AudioInput>Disable</AudioInput>
    <VideoInput>Disable</VideoInput>
