@@ -186,10 +186,10 @@ foreach ($Row in $Table) {
         -Name "ドキュメント"
 
     Copy-Content `
-        -WhatIf `
         -SourceList $srcList `
         -DestinationList $dstList `
-        -CopySettings $CopySettings
+        -CopySettings $CopySettings `
+        -WhatIf
 }
 
 # Remove site collection administrator permissions (uncomment this on the final run so that permissions can be removed from user OneDrive sites)
