@@ -35,6 +35,10 @@ foreach ($app in $AppsToRemove) {
 
 Write-Host "Cloud PC app cleanup finished successfully! Microsoft Store was preserved." -ForegroundColor Green
 
+# ========================================
+# Application installations
+# ========================================
+
 $apps = @(
     @{ Id = "AgileBits.1Password"; Name = "1Password" },
     @{ Id = "Microsoft.PowerShell"; Name = "PowerShell" },
@@ -46,30 +50,60 @@ $apps = @(
 
 foreach ($app in $apps) {
     Write-Host "Checking for $($app.Name)..." -ForegroundColor Cyan
-    
-    $installed = winget list --id $app.Id --exact --accept-source-agreements 2>&1
-    
-    if ($installed -match $app.Id) {
+
+    $installed = winget list `
+        --id $app.Id `
+        --exact `
+        --accept-source-agreements 2>&1
+
+    if ($installed -match [regex]::Escape($app.Id)) {
         Write-Host "$($app.Name) is already installed. Skipping." -ForegroundColor Yellow
-    } else {
-        Write-Host "Installing $($app.Name)..." -ForegroundColor Green
-        winget install --id $app.Id --exact --silent --disable-interactivity --accept-source-agreements --accept-package-agreements
     }
-    
+    else {
+        Write-Host "Installing $($app.Name)..." -ForegroundColor Green
+
+        winget install `
+            --id $app.Id `
+            --exact `
+            --silent `
+            --disable-interactivity `
+            --accept-source-agreements `
+            --accept-package-agreements
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "$($app.Name) installation failed." -ForegroundColor Red
+            exit 1
+        }
+    }
+
     Write-Host "----------------------------------------"
 }
 
-# Install Python
-Write-Host "Checking for Python..." -ForegroundColor Cyan
 
-$pythonInstalled = winget list --id Python.Python.3.14 --exact --accept-source-agreements 2>&1
+# ========================================
+# Install Python 3.14
+# ========================================
+
+Write-Host "Checking for Python 3.14..." -ForegroundColor Cyan
+
+$pythonInstalled = winget list `
+    --id Python.Python.3.14 `
+    --exact `
+    --accept-source-agreements 2>&1
 
 if ($pythonInstalled -match "Python.Python.3.14") {
     Write-Host "Python 3.14 is already installed. Skipping." -ForegroundColor Yellow
-} else {
+}
+else {
     Write-Host "Installing Python 3.14..." -ForegroundColor Green
 
-    winget install --id Python.Python.3.14 --exact --silent --disable-interactivity --accept-package-agreements --accept-source-agreements
+    winget install `
+        --id Python.Python.3.14 `
+        --exact `
+        --silent `
+        --disable-interactivity `
+        --accept-package-agreements `
+        --accept-source-agreements
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Python installation failed." -ForegroundColor Red
@@ -79,22 +113,179 @@ if ($pythonInstalled -match "Python.Python.3.14") {
 
 Write-Host "----------------------------------------"
 
-# Refresh PATH so the newly installed Python is available
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
-            [System.Environment]::GetEnvironmentVariable("Path", "User")
 
-# Install Selenium
-Write-Host "Installing Selenium..." -ForegroundColor Green
+# ========================================
+# Refresh PATH
+# ========================================
 
-python -m pip install selenium
+Write-Host "Refreshing PATH..." -ForegroundColor Cyan
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Selenium installation failed." -ForegroundColor Red
-    exit 1
+$env:Path = `
+    [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
+    [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+
+# ========================================
+# Install Python Playwright
+# ========================================
+
+Write-Host "Checking for Python Playwright..." -ForegroundColor Cyan
+
+$playwrightPython = python -m pip show playwright 2>&1
+
+if ($playwrightPython -match "^Name:\s+playwright") {
+    Write-Host "Python Playwright is already installed. Skipping." -ForegroundColor Yellow
+}
+else {
+    Write-Host "Installing Python Playwright..." -ForegroundColor Green
+
+    python -m pip install playwright
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Python Playwright installation failed." -ForegroundColor Red
+        exit 1
+    }
 }
 
 Write-Host "----------------------------------------"
+
+
+# ========================================
+# Install Node.js LTS
+# ========================================
+
+Write-Host "Checking for Node.js LTS..." -ForegroundColor Cyan
+
+$nodeInstalled = winget list `
+    --id OpenJS.NodeJS.LTS `
+    --exact `
+    --accept-source-agreements 2>&1
+
+if ($nodeInstalled -match "OpenJS.NodeJS.LTS") {
+    Write-Host "Node.js LTS is already installed. Skipping." -ForegroundColor Yellow
+}
+else {
+    Write-Host "Installing Node.js LTS..." -ForegroundColor Green
+
+    winget install `
+        --id OpenJS.NodeJS.LTS `
+        --exact `
+        --silent `
+        --disable-interactivity `
+        --accept-package-agreements `
+        --accept-source-agreements
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Node.js installation failed." -ForegroundColor Red
+        exit 1
+    }
+}
+
+Write-Host "----------------------------------------"
+
+
+# ========================================
+# Refresh PATH again
+# ========================================
+
+Write-Host "Refreshing PATH..." -ForegroundColor Cyan
+
+$env:Path = `
+    [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
+    [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+
+# ========================================
+# Install Playwright CLI
+# ========================================
+
+Write-Host "Checking for Playwright CLI..." -ForegroundColor Cyan
+
+$playwrightCliInstalled = npm list -g --depth=0 @playwright/cli 2>&1
+
+if ($playwrightCliInstalled -match "@playwright/cli") {
+    Write-Host "Playwright CLI is already installed. Skipping." -ForegroundColor Yellow
+}
+else {
+    Write-Host "Installing Playwright CLI..." -ForegroundColor Green
+
+    npm install -g @playwright/cli@latest
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Playwright CLI installation failed." -ForegroundColor Red
+        exit 1
+    }
+}
+
+Write-Host "----------------------------------------"
+
+
+# ========================================
+# Verify installations
+# ========================================
+
+Write-Host "Verifying installations..." -ForegroundColor Cyan
+
+Write-Host ""
+Write-Host "Python:" -ForegroundColor Cyan
+python --version
+
+Write-Host ""
+Write-Host "Node.js:" -ForegroundColor Cyan
+node --version
+
+Write-Host ""
+Write-Host "npm:" -ForegroundColor Cyan
+npm --version
+
+Write-Host ""
+Write-Host "Playwright CLI:" -ForegroundColor Cyan
+playwright-cli --version
+
+Write-Host ""
+Write-Host "Python Playwright:" -ForegroundColor Cyan
+python -c "import playwright; print('Playwright Python package installed')"
+
+Write-Host ""
+Write-Host "========================================"
+Write-Host "Core installations complete!" -ForegroundColor Green
+Write-Host "========================================"
+
+
+# ========================================
+# Playwright Edge Extension
+# ========================================
+
+Write-Host ""
+Write-Host "Checking Playwright Edge extension..." -ForegroundColor Cyan
+
+Write-Host ""
+Write-Host "The Playwright Edge extension must be installed in Edge." -ForegroundColor Yellow
+Write-Host "It is used to attach Playwright to your existing Edge tabs and" -ForegroundColor Yellow
+Write-Host "reuse your existing Microsoft SSO session." -ForegroundColor Yellow
+Write-Host ""
+
+$extensionCheck = Read-Host "Is the Playwright extension already installed in Edge? (Y/N)"
+
+if ($extensionCheck -match "^[Yy]$") {
+    Write-Host "Playwright Edge extension confirmed." -ForegroundColor Green
+}
+else {
+    Write-Host ""
+    Write-Host "Please install the official Playwright extension in Microsoft Edge." -ForegroundColor Yellow
+    Write-Host "After installation, return here and press Enter." -ForegroundColor Yellow
+
+    Start-Process "msedge.exe" "edge://extensions"
+
+    Read-Host "Press Enter once the Playwright extension is installed"
+
+    Write-Host "Playwright Edge extension setup completed." -ForegroundColor Green
+}
+
+Write-Host ""
+Write-Host "========================================"
 Write-Host "All installations complete!" -ForegroundColor Green
+Write-Host "========================================"
 
 # ==========================================================
 # PowerToys Silent Redeploy
