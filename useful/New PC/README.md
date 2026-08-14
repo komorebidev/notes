@@ -40,26 +40,60 @@ $apps = @(
     @{ Id = "Microsoft.PowerShell"; Name = "PowerShell" },
     @{ Id = "GitHub.cli"; Name = "GitHub CLI" },
     @{ Id = "Git.Git"; Name = "Git" },
-    @{ Id = "Mozilla.Firefox"; Name = "Firefox" }
+    @{ Id = "Mozilla.Firefox"; Name = "Firefox" },
     @{ Id = "Microsoft.PowerAutomateDesktop"; Name = "Power Automate for desktop" }
 )
 
 foreach ($app in $apps) {
     Write-Host "Checking for $($app.Name)..." -ForegroundColor Cyan
     
-    # Check if the app is already installed via winget
     $installed = winget list --id $app.Id --exact --accept-source-agreements 2>&1
     
     if ($installed -match $app.Id) {
         Write-Host "$($app.Name) is already installed. Skipping." -ForegroundColor Yellow
     } else {
         Write-Host "Installing $($app.Name)..." -ForegroundColor Green
-        winget install --id $app.Id -e --silent --accept-source-agreements --accept-package-agreements
+        winget install --id $app.Id --exact --silent --disable-interactivity --accept-source-agreements --accept-package-agreements
     }
     
     Write-Host "----------------------------------------"
 }
 
+# Install Python
+Write-Host "Checking for Python..." -ForegroundColor Cyan
+
+$pythonInstalled = winget list --id Python.Python.3.14 --exact --accept-source-agreements 2>&1
+
+if ($pythonInstalled -match "Python.Python.3.14") {
+    Write-Host "Python 3.14 is already installed. Skipping." -ForegroundColor Yellow
+} else {
+    Write-Host "Installing Python 3.14..." -ForegroundColor Green
+
+    winget install --id Python.Python.3.14 --exact --silent --disable-interactivity --accept-package-agreements --accept-source-agreements
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Python installation failed." -ForegroundColor Red
+        exit 1
+    }
+}
+
+Write-Host "----------------------------------------"
+
+# Refresh PATH so the newly installed Python is available
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
+            [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+# Install Selenium
+Write-Host "Installing Selenium..." -ForegroundColor Green
+
+python -m pip install selenium
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Selenium installation failed." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "----------------------------------------"
 Write-Host "All installations complete!" -ForegroundColor Green
 
 # ==========================================================
