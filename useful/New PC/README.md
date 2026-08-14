@@ -45,7 +45,8 @@ $apps = @(
     @{ Id = "GitHub.cli"; Name = "GitHub CLI" },
     @{ Id = "Git.Git"; Name = "Git" },
     @{ Id = "Mozilla.Firefox"; Name = "Firefox" },
-    @{ Id = "Microsoft.PowerAutomateDesktop"; Name = "Power Automate for desktop" }
+    @{ Id = "Microsoft.PowerAutomateDesktop"; Name = "Power Automate for desktop" },
+    @{ Id = "Oracle.VirtualBox"; Name = "Oracle VirtualBox" }
 )
 
 foreach ($app in $apps) {
