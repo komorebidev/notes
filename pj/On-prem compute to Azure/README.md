@@ -1,4 +1,4 @@
-# On-prem to Azure
+# On-prem compute to Azure
 
 ## For new VM
 * Requirement is to move a PC-based VM to Azure
