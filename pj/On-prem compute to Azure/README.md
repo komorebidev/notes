@@ -31,6 +31,8 @@
 
 ### Data
 * What database does it use? SQL Server, Access, MySQL, proprietary DB, files, etc.?
+    * Python
+    * MySQL
 * Where is the application's data currently stored?
 * Does it use Windows file shares?
 
@@ -94,3 +96,13 @@ Who will be helping with the below admin tasks?
 * Restore operations
 * Monitoring
 * Security updates
+
+### Meeting Notes
+
+* HTML page
+* Is a dashboard
+* Intranet only
+* Want RDP access to the server
+* Not confident to setup web server
+* So just want people to remote directly into the server
+* Because concerned about cybersecurity
