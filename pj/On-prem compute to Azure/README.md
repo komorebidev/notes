@@ -97,7 +97,7 @@ Who will be helping with the below admin tasks?
 * Monitoring
 * Security updates
 
-### Meeting Notes
+### Meeting Notes (08/18)
 
 * HTML page
 * Is a dashboard
