@@ -106,3 +106,9 @@ Who will be helping with the below admin tasks?
 * Not confident to setup web server
 * So just want people to remote directly into the server
 * Because concerned about cybersecurity
+* Using FTP in the future for data input? For scraping?
+* Not visible on the internet right now
+* Getting data from web scraping right now
+* Using mysql workbench on laptop
+> localhost:5050
+* Plant performance manager internal page
