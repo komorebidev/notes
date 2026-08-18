@@ -8,8 +8,8 @@
 
 * Sharepoint Migration Tool
 * Installed on the ec2 instance
-* No affect on ec2 performance (SSD backed)
-* No affect on customer circuit (AWS hosted)
+* No effect on ec2 performance (SSD backed)
+* No effect on customer circuit (AWS hosted)
 
 ## Permissions
 
