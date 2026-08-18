@@ -1,7 +1,7 @@
 # On-prem compute to Azure
 
 ## For new VM
-* Requirement is to move a PC-based VM to Azure
+* Requirement is to move a PC-based workload to Azure
 * Azure tenant is empty, no networking no nothing
 * The customer office also has no hookup to Azure yet (because their network is managed by others)
 
