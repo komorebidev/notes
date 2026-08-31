@@ -2,7 +2,7 @@ param location string
 param adminUsername string
 @secure()
 param adminPassword string
-param vmName string = 'plantvm-winserver'
+param vmName string = 'plant-pyvm'
 param subnetId string
 
 resource nic 'Microsoft.Network/networkInterfaces@2024-05-01' = {
