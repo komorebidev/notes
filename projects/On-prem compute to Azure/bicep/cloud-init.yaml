@@ -1,0 +1,11 @@
+#cloud-config
+package_update: true
+runcmd:
+  - dnf update -y
+  - dnf install -y https://packages.openvpn.net/as-repo-rhel9.rpm
+  - dnf install -y openvpn-as
+  - sysctl -w net.ipv4.ip_forward=1
+  - echo "net.ipv4.ip_forward=1" >> /etc/sysctl.d/99-ipforward.conf
+  - systemctl stop firewalld
+  - systemctl disable firewalld
+  - dnf remove -y firewalld

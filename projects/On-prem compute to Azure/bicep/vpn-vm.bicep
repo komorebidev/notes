@@ -32,15 +32,54 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   properties: {
     securityRules: [
       {
-        name: 'allowSSH-clientIp'
+        name: 'allow-ssh-clientIp'
         properties: {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '22'
-          sourceAddressPrefix: '${clientIp}/32' // Restricts SSH strictly to your IP
+          sourceAddressPrefix: '${clientIp}/32'
           destinationAddressPrefix: '*'
           access: 'Allow'
           priority: 100
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'allow-openvpn-admin-clientIp'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '943'
+          sourceAddressPrefix: '${clientIp}/32'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 110
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'allow-openvpn-web-ui'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 120
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'allow-openvpn-udp-tunnel'
+        properties: {
+          protocol: 'Udp'
+          sourcePortRange: '*'
+          destinationPortRange: '1194'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 130
           direction: 'Inbound'
         }
       }
