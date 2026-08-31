@@ -6,6 +6,11 @@
 $clientIp = (Invoke-RestMethod -Uri "https://ipinfo.io/ip"); az deployment sub create --location koreacentral --template-file main.bicep --parameters clientIp=$clientIp adminUsername='azureuser' adminPassword='Toranomon4128!'
 ```
 
+## Check cloud-init run status
+
+```powershell
+sudo cat /var/log/cloud-init-output.log
+```
 Creates the resource group and VNET
 
 # Azure POC Network Design
