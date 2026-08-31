@@ -1,4 +1,5 @@
 param location string
+param clientIp string
 
 var vnetName = 'vnet-poc'
 var vnetAddressSpace = '10.100.0.0/23'
@@ -14,9 +15,48 @@ resource vpnNsg 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   properties: {
     securityRules: [
       {
-        name: 'Allow-OpenVPN-UDP'
+        name: 'allow-ssh-clientIp'
         properties: {
           priority: 100
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '22'
+          sourceAddressPrefix: '${clientIp}/32'
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'allow-openvpn-admin-clientIp'
+        properties: {
+          priority: 110
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '943'
+          sourceAddressPrefix: '${clientIp}/32'
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'allow-openvpn-web-ui'
+        properties: {
+          priority: 120
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'allow-openvpn-udp-tunnel'
+        properties: {
+          priority: 130
           direction: 'Inbound'
           access: 'Allow'
           protocol: 'Udp'

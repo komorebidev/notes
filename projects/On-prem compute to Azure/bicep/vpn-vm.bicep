@@ -87,13 +87,21 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   }
 }
 
+resource subnetNsgAssociation 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
+  parent: existingVnet
+  name: 'snet-vpn'
+  properties: {
+    addressPrefix: vpnSubnet.properties.addressPrefix
+    networkSecurityGroup: {
+      id: nsg.id
+    }
+  }
+}
+
 resource nic 'Microsoft.Network/networkInterfaces@2024-05-01' = {
   name: '${vmName}-nic'
   location: location
   properties: {
-    networkSecurityGroup: {
-      id: nsg.id
-    }
     ipConfigurations: [
       {
         name: 'ipconfig1'
@@ -125,12 +133,12 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
       adminPassword: adminPassword
       customData: cloudInit
     }
-   storageProfile: {
-    imageReference: {
-      publisher: 'Debian'
-      offer: 'debian-11'
-      sku: '11'
-      version: 'latest'
+    storageProfile: {
+      imageReference: {
+        publisher: 'Debian'
+        offer: 'debian-11'
+        sku: '11-backports-gen2'
+        version: 'latest'
       }
       osDisk: {
         name: '${vmName}-disk'
