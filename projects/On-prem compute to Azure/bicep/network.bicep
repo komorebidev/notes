@@ -118,13 +118,34 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   }
 }
 
+// Safely bind to the inline subnets to extract their resource IDs for outputs
+resource vpnSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+  parent: vnet
+  name: 'snet-vpn'
+}
+
+resource appSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+  parent: vnet
+  name: 'snet-app'
+}
+
+resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+  parent: vnet
+  name: 'snet-private-endpoints'
+}
+
+resource managementSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+  parent: vnet
+  name: 'snet-management'
+}
+
 output vnetName string = vnet.name
 output vnetId string = vnet.id
 output vnetAddressSpace string = vnetAddressSpace
-output vpnSubnetId string = vnet.properties.subnets[0].id
-output appSubnetId string = vnet.properties.subnets[1].id
-output privateEndpointSubnetId string = vnet.properties.subnets[2].id
-output managementSubnetId string = vnet.properties.subnets[3].id
+output vpnSubnetId string = vpnSubnet.id
+output appSubnetId string = appSubnet.id
+output privateEndpointSubnetId string = privateEndpointSubnet.id
+output managementSubnetId string = managementSubnet.id
 
 @description('Reserved OpenVPN client address pool. This is not an Azure subnet.')
 output openVpnClientPool string = '10.100.8.0/24'
