@@ -3,7 +3,7 @@
 ## Run command
 
 ```powershell
-az deployment sub create --location koreacentral --template-file main.bicep
+$clientIp = (Invoke-RestMethod -Uri "https://api.ipify.org"); az deployment sub create --location koreacentral --template-file main.bicep --parameters clientIp=$clientIp adminUsername='azureuser' adminPassword='Toranomon4128!'
 ```
 
 Creates the resource group and VNET
