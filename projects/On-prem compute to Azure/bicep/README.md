@@ -1,0 +1,109 @@
+# Bicep
+
+## Run command
+
+```powershell
+az deployment sub create --location japaneast --template-file network.bicep
+```
+
+Creates the resource group and VNET
+
+# Azure POC Network Design
+
+## Overview
+
+This Bicep template creates the initial Azure networking environment for a small enterprise POC that is expected to eventually transition into production.
+
+The design intentionally keeps the network small while leaving enough room for future expansion. It uses standard RFC 1918 private address space and avoids overlapping with the organization's existing networks.
+
+The environment currently has fewer than 100 employees, so allocating an unnecessarily large Azure address space such as a `/16` is not required.
+
+---
+
+## Existing Corporate Addressing
+
+The organization's existing networks include:
+
+| Network | CIDR |
+|---|---|
+| AP_MGMT | `10.0.10.0/24` |
+| CORP_LAN | `10.0.20.0/24` |
+| VOIP_LAN | `10.0.30.0/24` |
+| AV_LAN | `10.0.40.0/24` |
+| SECURITY_VLAN | `10.0.70.0/24` |
+| JapanEntry | `10.0.80.0/24` |
+| Corp | `10.0.90.0/24` |
+| Guest | `192.168.88.0/24` |
+| FortiLink | `10.255.1.0/24` |
+| Quarantine | `10.255.11.0/24` |
+| RSPAN | `10.255.12.0/24` |
+| NAC_Segment | `10.255.13.0/24` |
+
+The Azure address space was selected from a separate portion of RFC 1918 private space:
+
+```text
+10.100.0.0/20
+```
+
+## VNet Design
+
+```text
+VNet
+10.100.0.0/23
+│
+├── snet-vpn
+│   10.100.0.0/27
+│
+├── snet-app
+│   10.100.0.32/26
+│
+├── snet-private-endpoints
+│   10.100.0.96/26
+│
+└── snet-management
+    10.100.0.160/27
+```
+
+## VNet Subnet Allocation
+
+| Subnet Name | CIDR | Prefix | Total IPs | Azure Usable IPs | Purpose |
+|---|---|---:|---:|---:|---|
+| `snet-vpn` | `10.100.0.0/27` | /27 | 32 | 27 | OpenVPN server |
+| `snet-app` | `10.100.0.32/26` | /26 | 64 | 59 | Application workloads |
+| `snet-private-endpoints` | `10.100.0.96/26` | /26 | 64 | 59 | Azure Private Endpoints |
+| `snet-management` | `10.100.0.160/27` | /27 | 32 | 27 | Management resources |
+| **Unallocated / Reserved** | `10.100.0.192/26` | /26 | 64 | 59 | Reserved for future requirements |
+
+> **Azure subnet note:** Azure reserves 5 IP addresses from each subnet (the first four and the last address).
+
+## Address Hierarchy
+
+| Level | CIDR | Purpose |
+|---|---|---|
+| Azure planned allocation | `10.100.0.0/20` | Reserved in IPAM/documentation for Azure |
+| Production VNet | `10.100.0.0/23` | Actual Azure VNet |
+| `snet-vpn` | `10.100.0.0/27` | OpenVPN server |
+| `snet-app` | `10.100.0.32/26` | Application workloads |
+| `snet-private-endpoints` | `10.100.0.96/26` | Private Endpoints |
+| `snet-management` | `10.100.0.160/27` | Management resources |
+| Reserved inside VNet | `10.100.0.192/26` | Future expansion |
+| VPN client pool | `10.100.8.0/24` | OpenVPN/P2S client addresses |
+
+## Address Space
+
+```text
+10.100.0.0/20 — Azure planned allocation
+│
+├── 10.100.0.0/23 — Production VNet
+│   │
+│   ├── 10.100.0.0/27     — snet-vpn
+│   ├── 10.100.0.32/26    — snet-app
+│   ├── 10.100.0.96/26    — snet-private-endpoints
+│   ├── 10.100.0.160/27   — snet-management
+│   └── 10.100.0.192/26   — Reserved
+│
+└── Remaining 10.100.2.0/23 - 10.100.15.255
+    └── Reserved for future Azure requirements
+
+10.100.8.0/24 — VPN client pool
+```
