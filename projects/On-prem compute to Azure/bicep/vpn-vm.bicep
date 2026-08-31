@@ -127,10 +127,10 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
     }
    storageProfile: {
     imageReference: {
-      publisher: Debian
-      offer: debian-11
-      sku: 11
-      version: latest
+      publisher: 'Debian'
+      offer: 'debian-11'
+      sku: '11'
+      version: 'latest'
       }
       osDisk: {
         name: '${vmName}-disk'
