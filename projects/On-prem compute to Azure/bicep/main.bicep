@@ -6,6 +6,9 @@ param location string = 'koreacentral'
 var subscriptionSuffix = substring(subscription().id, length(subscription().id) - 4, 4)
 var resourceGroupName = 'devrg-${subscriptionSuffix}'
 
+@description('Admin username for the OpenVPN VM passed from PowerShell')
+param adminUsername string
+
 @secure()
 param adminPassword string
 
@@ -32,9 +35,9 @@ module vpnVm './vpn-vm.bicep' = {
   scope: resourceGroup
   params: {
     location: location
-    adminUsername: 'azureuser'
-    adminPassword: 'YourSecurePassword123!' // Replace or use a parameter/secure parameter
-    clientIp: 'YOUR_PUBLIC_IP' // Replace with your local machine's public IP for SSH restriction
+    adminUsername: adminUsername
+    adminPassword: adminPassword // Replace or use a parameter/secure parameter
+    clientIp: clientIp // Replace with your local machine's public IP for SSH restriction or pass from PowerShell
   }
 }
 
