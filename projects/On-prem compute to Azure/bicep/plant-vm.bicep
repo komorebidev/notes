@@ -48,7 +48,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
       osDisk: {
         name: '${vmName}-osdisk'
         createOption: 'FromImage'
-        diskSizeGB: 100
+        diskSizeGB: 127
         deleteOption: 'Detach'
         managedDisk: {
           storageAccountType: 'StandardSSD_LRS'
