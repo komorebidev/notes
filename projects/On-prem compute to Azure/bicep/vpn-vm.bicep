@@ -3,17 +3,7 @@ param adminUsername string
 @secure()
 param adminPassword string
 param vmName string = 'vm-openvpn'
-param clientIp string
-param vnetName string = 'vnet-poc'
-
-resource existingVnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
-  name: vnetName
-}
-
-resource vpnSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
-  parent: existingVnet
-  name: 'snet-vpn'
-}
+param subnetId string
 
 resource publicIp 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   name: '${vmName}-pip'
@@ -26,78 +16,6 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   }
 }
 
-resource nsg 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
-  name: '${vmName}-nsg'
-  location: location
-  properties: {
-    securityRules: [
-      {
-        name: 'allow-ssh-clientIp'
-        properties: {
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '22'
-          sourceAddressPrefix: '${clientIp}/32'
-          destinationAddressPrefix: '*'
-          access: 'Allow'
-          priority: 100
-          direction: 'Inbound'
-        }
-      }
-      {
-        name: 'allow-openvpn-admin-clientIp'
-        properties: {
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '943'
-          sourceAddressPrefix: '${clientIp}/32'
-          destinationAddressPrefix: '*'
-          access: 'Allow'
-          priority: 110
-          direction: 'Inbound'
-        }
-      }
-      {
-        name: 'allow-openvpn-web-ui'
-        properties: {
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '443'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-          access: 'Allow'
-          priority: 120
-          direction: 'Inbound'
-        }
-      }
-      {
-        name: 'allow-openvpn-udp-tunnel'
-        properties: {
-          protocol: 'Udp'
-          sourcePortRange: '*'
-          destinationPortRange: '1194'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-          access: 'Allow'
-          priority: 130
-          direction: 'Inbound'
-        }
-      }
-    ]
-  }
-}
-
-resource subnetNsgAssociation 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
-  parent: existingVnet
-  name: 'snet-vpn'
-  properties: {
-    addressPrefix: vpnSubnet.properties.addressPrefix
-    networkSecurityGroup: {
-      id: nsg.id
-    }
-  }
-}
-
 resource nic 'Microsoft.Network/networkInterfaces@2024-05-01' = {
   name: '${vmName}-nic'
   location: location
@@ -107,7 +25,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2024-05-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: vpnSubnet.id
+            id: subnetId
           }
           publicIPAddress: {
             id: publicIp.id

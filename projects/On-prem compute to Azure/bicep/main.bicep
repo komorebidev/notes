@@ -36,6 +36,7 @@ module vpnVm './vpn-vm.bicep' = {
     location: location
     adminUsername: adminUsername
     adminPassword: adminPassword
+    subnetId: network.outputs.vpnSubnetId
   }
 }
 
@@ -51,4 +52,5 @@ output managementSubnetId string = network.outputs.managementSubnetId
 
 @description('Reserved OpenVPN client address pool. This is not an Azure subnet.')
 output openVpnClientPool string = network.outputs.openVpnClientPool
+
 output openVpnServerPublicIp string = vpnVm.outputs.vmPublicIpAddress
