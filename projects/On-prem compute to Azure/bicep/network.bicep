@@ -2,10 +2,11 @@ param location string
 
 var vnetName = 'vnet-poc'
 var vnetAddressSpace = '10.100.0.0/23'
+
 var vpnSubnetPrefix = '10.100.0.0/27'
-var appSubnetPrefix = '10.100.0.32/26'
-var privateEndpointSubnetPrefix = '10.100.0.96/26'
-var managementSubnetPrefix = '10.100.0.160/27'
+var appSubnetPrefix = '10.100.0.64/26'
+var privateEndpointSubnetPrefix = '10.100.0.128/26'
+var managementSubnetPrefix = '10.100.0.192/27'
 
 resource vpnNsg 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   name: '${vnetName}-vpn-nsg'
@@ -118,7 +119,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   }
 }
 
-// Safely bind to the inline subnets to extract their resource IDs for outputs
 resource vpnSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
   parent: vnet
   name: 'snet-vpn'
