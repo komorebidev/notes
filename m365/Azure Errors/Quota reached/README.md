@@ -5,4 +5,4 @@
 
 * https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types
 
-* The provider is Microsoft.Quota
+* The provider is Microsoft.Quota or Microsoft.Compute
