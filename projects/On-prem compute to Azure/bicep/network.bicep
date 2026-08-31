@@ -9,6 +9,8 @@ var appSubnetPrefix = '10.100.0.64/26'
 var privateEndpointSubnetPrefix = '10.100.0.128/26'
 var managementSubnetPrefix = '10.100.0.192/27'
 
+var openVpnClientPool = '10.100.8.0/24'
+
 resource vpnNsg 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   name: '${vnetName}-vpn-nsg'
   location: location
@@ -76,9 +78,35 @@ resource appNsg 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   properties: {
     securityRules: [
       {
-        name: 'Allow-HTTPS-From-VNet'
+        name: 'Allow-RDP-From-VPN-Pool'
         properties: {
           priority: 100
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '3389'
+          sourceAddressPrefix: openVpnClientPool
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'Allow-RDP-From-VPN-Subnet'
+        properties: {
+          priority: 110
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '3389'
+          sourceAddressPrefix: vpnSubnetPrefix
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'Allow-HTTPS-From-VNet'
+        properties: {
+          priority: 120
           direction: 'Inbound'
           access: 'Allow'
           protocol: 'Tcp'
@@ -186,6 +214,4 @@ output vpnSubnetId string = vpnSubnet.id
 output appSubnetId string = appSubnet.id
 output privateEndpointSubnetId string = privateEndpointSubnet.id
 output managementSubnetId string = managementSubnet.id
-
-@description('Reserved OpenVPN client address pool. This is not an Azure subnet.')
-output openVpnClientPool string = '10.100.8.0/24'
+output openVpnClientPool string = openVpnClientPool

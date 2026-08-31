@@ -6,7 +6,7 @@ param location string = 'koreacentral'
 var subscriptionSuffix = substring(subscription().id, length(subscription().id) - 4, 4)
 var resourceGroupName = 'devrg-${subscriptionSuffix}'
 
-@description('Admin username for the OpenVPN VM passed from PowerShell')
+@description('Admin username for the VMs passed from PowerShell')
 param adminUsername string
 
 @secure()
@@ -40,6 +40,17 @@ module vpnVm './vpn-vm.bicep' = {
   }
 }
 
+module plantVm './plant-vm.bicep' = {
+  name: 'plantVmDeployment'
+  scope: resourceGroup
+  params: {
+    location: location
+    adminUsername: adminUsername
+    adminPassword: adminPassword
+    subnetId: network.outputs.appSubnetId
+  }
+}
+
 output resourceGroupName string = resourceGroupName
 output subscriptionId string = subscription().id
 output vnetName string = network.outputs.vnetName
@@ -54,3 +65,4 @@ output managementSubnetId string = network.outputs.managementSubnetId
 output openVpnClientPool string = network.outputs.openVpnClientPool
 
 output openVpnServerPublicIp string = vpnVm.outputs.vmPublicIpAddress
+output plantVmPrivateIp string = plantVm.outputs.vmPrivateIpAddress
