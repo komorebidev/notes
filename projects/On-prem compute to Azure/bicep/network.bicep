@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 @description('Azure region where the resource group and networking resources will be created.')
-param location string = 'japaneast'
+param location string = 'koreacentral'
 
 // -----------------------------------------------------------------------------
 // Resource Group

@@ -3,7 +3,7 @@
 ## Run command
 
 ```powershell
-az deployment sub create --location japaneast --template-file network.bicep
+az deployment sub create --location koreacentral --template-file network.bicep
 ```
 
 Creates the resource group and VNET
