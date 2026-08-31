@@ -25,10 +25,9 @@ module network './network.bicep' = {
   scope: resourceGroup
   params: {
     location: location
+    clientIp: clientIp
   }
 }
-
-// ... keep your existing resource group and network module declarations ...
 
 module vpnVm './vpn-vm.bicep' = {
   name: 'vpnVmDeployment'
@@ -36,8 +35,7 @@ module vpnVm './vpn-vm.bicep' = {
   params: {
     location: location
     adminUsername: adminUsername
-    adminPassword: adminPassword // Replace or use a parameter/secure parameter
-    clientIp: clientIp // Replace with your local machine's public IP for SSH restriction or pass from PowerShell
+    adminPassword: adminPassword
   }
 }
 
@@ -53,6 +51,4 @@ output managementSubnetId string = network.outputs.managementSubnetId
 
 @description('Reserved OpenVPN client address pool. This is not an Azure subnet.')
 output openVpnClientPool string = network.outputs.openVpnClientPool
-
-// vpn-vm
 output openVpnServerPublicIp string = vpnVm.outputs.vmPublicIpAddress
