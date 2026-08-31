@@ -127,9 +127,9 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
     }
     storageProfile: {
       imageReference: {
-        publisher: 'resf'
-        offer: 'rockylinux-9'
-        sku: '9-gen2'
+        publisher: 'Debian'
+        offer: 'debian-11'
+        sku: '11-backports-gen2'
         version: 'latest'
       }
       osDisk: {
