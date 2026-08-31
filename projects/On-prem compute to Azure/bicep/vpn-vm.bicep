@@ -55,7 +55,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
       imageReference: {
         publisher: 'Debian'
         offer: 'debian-11'
-        sku: '11-backports-gen2'
+        sku: '11'
         version: 'latest'
       }
       osDisk: {
