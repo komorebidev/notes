@@ -125,12 +125,12 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
       adminPassword: adminPassword
       customData: cloudInit
     }
-    storageProfile: {
-      imageReference: {
-        publisher: 'Debian'
-        offer: 'debian-11'
-        sku: '11-backports-gen2'
-        version: 'latest'
+   storageProfile: {
+    imageReference: {
+      publisher: Debian
+      offer: debian-11
+      sku: 11
+      version: latest
       }
       osDisk: {
         name: '${vmName}-disk'
