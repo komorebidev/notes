@@ -6,6 +6,12 @@
 $clientIp = (Invoke-RestMethod -Uri "https://ipinfo.io/ip"); az deployment sub create --location koreacentral --template-file main.bicep --parameters clientIp=$clientIp adminUsername='azureuser' adminPassword='Toranomon4128!'
 ```
 
+## Cleanup entra on decommission
+
+```powershell
+az rest --method DELETE --url "https://graph.microsoft.com/v1.0/devices?\$filter=displayName eq 'plant-pyvm'"
+```
+
 ## Check cloud-init run status
 
 ```powershell
