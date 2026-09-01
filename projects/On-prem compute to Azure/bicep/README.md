@@ -1,5 +1,24 @@
 # Bicep
 
+## Azure cost estimate without site to site VPN
+
+| Resource Scope | USD Range | JPY Range (Approx.) |
+| :--- | :--- | :--- |
+| **Compute & Storage Infrastructure** <br>(`plant-pyvm` D4s v5, `vm-openvpn` B2ats v2, 3 disks) | $175 – $235 / mo | **¥28,000 – ¥37,500 / mo** |
+| **Public IP Addresses** <br>(2 × Standard Static Public IPs) | ~$7.30 – $8.00 / mo | **~¥1,170 – ¥1,280 / mo** |
+| **Network & DNS Services** <br>(VNets, NSGs, Private DNS Zone `corp.internal`) | ~$0.50 / mo | **~¥80 / mo** |
+| **Estimated Monthly Total (Without Bastion)** | **$183 – $244+ / mo** | **¥29,250 – ¥38,860+ / mo** |
+
+## Site to Site VPN cost estimate
+
+| Resource Scope | USD Range | JPY Range (Approx.) |
+| :--- | :--- | :--- |
+| **Compute & Storage Infrastructure** <br>(`plant-pyvm` D4s v5, 2 data/OS disks — *excludes OpenVPN VM & disk*) | $160 – $210 / mo | **¥25,500 – ¥33,600 / mo** |
+| **Azure VPN Gateway (`VpnGw1AZ`) + Public IP** | ~$157 / mo | **~¥25,150 / mo** |
+| **Plant-PyVM Public IP Address** <br>(1 × Standard Static Public IP) | ~$3.65 – $4.00 / mo | **~¥600 – ¥640 / mo** |
+| **Network & DNS Services** <br>(VNets, NSGs, Private DNS Zone `corp.internal`) | ~$0.50 / mo | **~¥80 / mo** |
+| **Estimated Monthly Total (Native S2S VPN, No Bastion)** | **$321 – $371+ / mo** | **¥51,330 – ¥59,470+ / mo** |
+
 ## Run command
 
 ```powershell
@@ -19,6 +38,11 @@ $clientIp = (Invoke-RestMethod -Uri "https://ipinfo.io/ip"); az deployment sub c
 
 - Delete from Entra ID from devices tab
 - Otherwise redeploy will have issues
+- Can use below command to fetch all Entra devices
+
+```powershell
+az rest --method GET --url "https://graph.microsoft.com/v1.0/devices" --query "value[].displayName"   
+```
 
 ## Check cloud-init run status
 
