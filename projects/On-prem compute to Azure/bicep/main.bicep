@@ -51,6 +51,15 @@ module plantVm './plant-vm.bicep' = {
   }
 }
 
+module privatednszone './privatednszone.bicep' = {
+  name: 'privatednszoneDeployment'
+  params: {
+    location: location
+    vnetId: network.outputs.vnetId
+    privateDnsZoneName: 'corp.internal'
+  }
+}
+
 output resourceGroupName string = resourceGroupName
 output subscriptionId string = subscription().id
 output vnetName string = network.outputs.vnetName
