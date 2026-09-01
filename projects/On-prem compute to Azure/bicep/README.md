@@ -17,9 +17,8 @@ $clientIp = (Invoke-RestMethod -Uri "https://ipinfo.io/ip"); az deployment sub c
 
 ## Cleanup entra on decommission
 
-```powershell
-az rest --method DELETE --url "https://graph.microsoft.com/v1.0/devices?\$filter=displayName eq 'plant-pyvm'"
-```
+- Delete from Entra ID from devices tab
+- Otherwise redeploy will have issues
 
 ## Check cloud-init run status
 
