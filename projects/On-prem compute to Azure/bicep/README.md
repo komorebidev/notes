@@ -6,6 +6,15 @@
 $clientIp = (Invoke-RestMethod -Uri "https://ipinfo.io/ip"); az deployment sub create --location koreacentral --template-file main.bicep --parameters clientIp=$clientIp adminUsername='azureuser' adminPassword='Toranomon4128!'
 ```
 
+## Initializing 200gb data disk
+
+- This disk is created by Bicep but needs to be initialized manually from disk management
+
+## Scripts inside temp folder
+
+- Sometimes deploy won't run the scripts
+- Just run them manually in that case from temp folder
+
 ## Cleanup entra on decommission
 
 ```powershell
@@ -17,7 +26,8 @@ az rest --method DELETE --url "https://graph.microsoft.com/v1.0/devices?\$filter
 ```powershell
 sudo cat /var/log/cloud-init-output.log
 ```
-Creates the resource group and VNET
+
+- This also shows the OpenVPN Access Server login info
 
 ## Extra things which were needed to get things working
 
@@ -48,8 +58,10 @@ Creates the resource group and VNET
 - Linked the Private DNS Zone to the target Azure Virtual Network with **Auto-registration** enabled.
 
 ## 3. OpenVPN Server Settings
-- Configured OpenVPN Access Server to push the Debian server's VPN interface IP (`10.8.0.1`) as the primary DNS resolver.
+- Configured OpenVPN Access Server to push the Debian server's VPN interface IP (`10.8.0.1`) as the primary DNS resolver. (or bind to adapters instead)
 - Pushed `corp.internal` as the DNS search domain to connected client machines.
+
+- Also needed to setup enterprise app in Azure for SAML entra authentication
 
 ## 4. Microsoft Entra ID & Extension Setup on the VM
 - Navigated to the Windows Server VM in the Azure Portal.
