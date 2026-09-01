@@ -104,4 +104,19 @@ resource installToolsExtension 'Microsoft.Compute/virtualMachines/extensions@202
   }
 }
 
+resource dnsSuffixExtension 'Microsoft.Compute/virtualMachines/extensions@2024-05-01' = {
+  parent: vm
+  name: 'SetPrimaryDnsSuffix'
+  location: location
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    protectedSettings: {
+      commandToExecute: 'powershell.exe -NonInteractive -ExecutionPolicy Unrestricted -Command "$scriptBytes = [System.Convert]::FromBase64String(\'${loadFileAsBase64('set-dns-suffix.ps1')}\'); [System.IO.Directory]::CreateDirectory(\'C:\\temp\') | Out-Null; [System.IO.File]::WriteAllBytes(\'C:\\temp\\set-dns-suffix.ps1\', $scriptBytes); & \'C:\\temp\\set-dns-suffix.ps1\'"'
+    }
+  }
+}
+
 output vmPrivateIpAddress string = nic.properties.ipConfigurations[0].properties.privateIPAddress
