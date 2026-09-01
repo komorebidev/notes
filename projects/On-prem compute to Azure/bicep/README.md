@@ -13,6 +13,60 @@ sudo cat /var/log/cloud-init-output.log
 ```
 Creates the resource group and VNET
 
+## Extra things which were needed to get things working
+
+# Full Setup Summary: OpenVPN, Azure DNS, Entra ID RDP
+
+## 1. Debian Server `dnsmasq` Installation & Configuration
+- Update and install `dnsmasq`:
+  ```bash
+  sudo apt update
+  sudo apt install dnsmasq -y
+  ```
+- Configure listen addresses and conditional forwarding in the configuration file (e.g., `/etc/dnsmasq.conf` or `/etc/dnsmasq.d/azure.conf`):
+  ```text
+  listen-address=127.0.0.1,10.8.0.1
+  bind-interfaces
+  server=/corp.internal/168.63.129.16
+  ```
+- Restart and enable the service:
+  ```bash
+  sudo systemctl restart dnsmasq
+  sudo systemctl enable dnsmasq
+  ```
+
+  - Had to add the App subnet to the OpenVPN access server global access rules allowed traffic subnets for NAT
+
+## 2. Azure Infrastructure & DNS Configuration
+- Created an Azure Private DNS Zone named `corp.internal`.
+- Linked the Private DNS Zone to the target Azure Virtual Network with **Auto-registration** enabled.
+
+## 3. OpenVPN Server Settings
+- Configured OpenVPN Access Server to push the Debian server's VPN interface IP (`10.8.0.1`) as the primary DNS resolver.
+- Pushed `corp.internal` as the DNS search domain to connected client machines.
+
+## 4. Microsoft Entra ID & Extension Setup on the VM
+- Navigated to the Windows Server VM in the Azure Portal.
+- Opened **Extensions + applications** -> **Add** -> installed the **Microsoft Entra Login** (`AADLoginForWindows`) extension.
+
+## 5. Azure RBAC Role Assignment
+- Navigated to the target Virtual Machine (`plant-pyvm`) in the Azure Portal.
+- Clicked **Access control (IAM)** -> **Add** -> **Add role assignment**.
+- Selected the **Virtual Machine Administrator Login** role.
+- Selected **User, group, or service principal**, added your user account, and completed the assignment.
+
+## 6. Windows Server OS Identity & Suffix Configuration
+- Kept the local computer hostname as `plant-pyvm`.
+- Opened `sysdm.cpl` -> **Computer Name** tab -> **Change** -> **More...**
+- Set the **Primary DNS Suffix of this computer** to `corp.internal`.
+- Restarted the VM to bind cryptographic tokens and FQDN registration.
+
+## 7. Final RDP Connection
+- Connected to the full-tunnel OpenVPN client.
+- Launched Remote Desktop (`mstsc`).
+- Targeted the exact FQDN: `plant-pyvm.corp.internal`.
+- Checked **"Use a web account to sign in to the remote computer"** under the Advanced tab and authenticated successfully with Entra ID credentials.
+
 # Azure POC Network Design
 
 ## Overview
