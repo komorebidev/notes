@@ -6,6 +6,7 @@ packages:
   - net-tools
   - gnupg
   - dnsmasq
+  - dnsutils
 
 write_files:
   - path: /etc/systemd/resolved.conf.d/dnsstub.conf
