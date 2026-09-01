@@ -19,6 +19,19 @@ $clientIp = (Invoke-RestMethod -Uri "https://ipinfo.io/ip"); az deployment sub c
 
 - Delete from Entra ID from devices tab
 - Otherwise redeploy will have issues
+- Or can try command...
+
+```powershell
+$deviceId = (az rest --method GET --url "https://graph.microsoft.com/v1.0/devices" --query "value[?displayName=='plant-pyvm'].id | [0]" -o tsv).Trim()
+
+if (-not [string]::IsNullOrEmpty($deviceId) -and $deviceId -ne "None" -and $deviceId -ne "null") {
+    Write-Host "Found device ID: $deviceId"
+    az rest --method DELETE --url "https://graph.microsoft.com/v1.0/devices/$deviceId"
+    Write-Host "Stale Entra ID device 'plant-pyvm' successfully deleted."
+} else {
+    Write-Host "No matching device found in Entra ID."
+}
+```
 
 ## Check cloud-init run status
 
