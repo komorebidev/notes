@@ -23,6 +23,12 @@
 | **Standard_B2s** (Legacy B) | 2 vCPUs / 4 GiB | ~\$30.37 | 約 4,802 円 | Older generation burstable VM. Includes a local temporary disk, but costs ~70% more. |
 | **Standard_A2_v2** (Legacy A) | 2 vCPUs / 4 GiB | ~\$65.92 | 約 10,423 円 | Flat-rate budget compute. Heavily discouraged because it is retiring in 2028. |
 
+### 💻 Azure Standard_B2as_v2 Monthly Cost (2 vCPUs / 8 GiB RAM)
+
+| Operating System | Hourly Price | Estimated Monthly (USD) | Estimated Monthly (Yen) |
+| :--- | :--- | :--- | :--- |
+| 🐧 **Linux (Ubuntu/Debian)** | \$0.0460 | ~\$33.58 | 約 5,310 円 |
+| 🪟 **Windows Server** | \$0.1020 | ~\$74.46 | 約 11,774 円 |
 
 ## Production
 
