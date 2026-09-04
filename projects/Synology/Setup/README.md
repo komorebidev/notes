@@ -27,6 +27,7 @@
 
 Configuring Microsoft Entra ID (Azure AD) login for your Synology NAS using OpenID Connect (OIDC) involves registering an application in Microsoft Entra and mapping those details in DSM. 
 
+* https://kb.synology.com/en-br/DSM/tutorial/How_to_activate_Entra_ID_SAML_SSO#:~:text=Purpose.%20This%20tutorial%20explains%20how%20to%20activate,instructions%20are%20based%20on%20Microsoft%20Entra%20ID.
 * https://kb.synology.com/en-global/DSM/help/DSM/AdminCenter/file_directory_service_sso_Azure?version=7
 
 ### Step 1: Register an App in Microsoft Entra
